@@ -1,0 +1,1 @@
+Copier .env.example en .env et y mettre sa clé FRED (gratuite sur fred.stlouisfed.org).
