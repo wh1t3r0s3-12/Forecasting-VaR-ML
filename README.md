@@ -1,7 +1,55 @@
-Copier .env.example en .env et y mettre sa clé FRED (gratuite sur fred.stlouisfed.org).
+# Forecasting Value at Risk with Machine Learning
 
+**Group:** Raphaël POUNGAVANON, Rémi KORDEK — ESILV A4, Financial Engineering (IF4)
 
+## Problem statement
+Can a quantile-regression Machine Learning model forecast the 1-day 99 % Value at Risk
+of the S&P 500 more accurately than historical simulation, the industry-standard baseline —
+and does the gain come from the model or from the features?
 
+## Data
+- **S&P 500** (`^GSPC`) and **VIX** (`^VIX`), daily, January 2000 – November 2026, from Yahoo Finance (`yfinance`)
+- Optional: macro-financial series from the FRED API
+- Target: tomorrow's log-return r(t+1); the model forecasts its 1 % quantile
+
+## Project structure
+```
+data/
+  raw/            raw downloads (never modified)
+  processed/      dataset.csv: cleaned data + features + target
+notebooks/
+  01_data_collecting.ipynb    download S&P 500 and VIX
+  02_eda_processing.ipynb     data quality, EDA, feature engineering
+  03_baseline.ipynb           historical simulation VaR + backtesting
+  04_ml_models.ipynb          quantile regression models
+  05_advanced_models.ipynb    ensemble and neural network
+results/          figures and metrics
+report/           final report
+ai_governance/    CONTRIBUTIONS.md, PROMPT_LOG.md, AI_AUDIT.md
+```
+
+## How to run
+1. Install the dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. (Optional, for FRED data) copy `.env.example` to `.env` and add your free FRED API key
+   (https://fred.stlouisfed.org/docs/api/api_key.html)
+3. Run the notebooks **in order** (01 → 05), from the `notebooks/` folder.
+   Each notebook reads the output of the previous one.
+
+## Methodology
+- **Chronological split** (train / validation / test), no shuffling
+- **Baseline:** historical simulation (250-day window)
+- **Models:** linear quantile regression, gradient boosting (quantile loss), neural network
+- **Evaluation:** pinball loss, violation rate, Kupiec and Christoffersen tests, Basel traffic light
+- **Reproducibility:** fixed random seed, relative paths, pinned dependencies
+
+## Results
+*To be completed.*
+
+## AI governance
+Use of AI assistants is documented in `ai_governance/`.
 
 ## References
 
