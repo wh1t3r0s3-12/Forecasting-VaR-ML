@@ -74,14 +74,14 @@ Following the methodological turning point of Engle and Manganelli (2001) with t
 % =====================================================================
 \section{Problem Statement}
 \begin{questionbox}
-``Can a quantile-regression Machine Learning model forecast the 1-day 99\,\% Value at Risk of a stock index (S\&P~500) more accurately than historical simulation, the industry-standard baseline --- and does the gain come from the model or from the features?''
+``Historical simulation adapts slowly to volatility shocks and underestimates risk at the onset of crises. Can a quantile regression model conditioned on current volatility correct this lag?''
 \end{questionbox}
 This main research question breaks down into four concrete sub-questions:
 \begin{enumerate}
-  \item \textbf{Feature contribution:} Which variables carry the information for tail risk (recent realized volatility, implied volatility VIX, intraday High--Low range, lagged returns) --- which one is indispensable?
-  \item \textbf{Model vs.\ features:} With the exact same features, does a non-linear ML model (Gradient Boosting, Neural Network) beat a linear quantile regression? This test separates the model effect from the feature effect.
-  \item \textbf{Regime behaviour:} Where do the models fail --- in calm periods or during crisis episodes (2020 COVID crash, 2022 rate shock)?
-  \item \textbf{Asymmetric cost of errors:} Does the model underestimate or overestimate risk? The two errors do not have the same cost: underestimating exposes the bank, whereas overestimating immobilizes capital unnecessarily.
+  \item \textbf{Reactivity to volatility shocks:} Does conditioning on current volatility measures (realized rolling volatility, implied volatility VIX, intraday High--Low range) reduce the clustering of VaR violations at the onset of market crises compared to the 250-day historical simulation?
+  \item \textbf{Post-crisis adjustment \& asymmetric cost:} Once a shock subsides, does the model readjust downward faster than the 250-day rolling window (avoiding unnecessary capital immobilization), while preventing risk underestimation during stress episodes?
+  \item \textbf{Feature contribution:} Which current volatility indicator carries the most predictive signal to correct the historical simulation lag --- realized volatility, intraday range, or forward-looking implied volatility (VIX)?
+  \item \textbf{Linear vs.\ non-linear quantile models:} Given the exact same volatility features, does a non-linear ML model (Gradient Boosting, Neural Network) capture regime switches better than a linear quantile regression?
 \end{enumerate}
 
 % =====================================================================
