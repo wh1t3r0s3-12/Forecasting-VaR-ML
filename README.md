@@ -54,7 +54,8 @@ Use of AI assistants is documented in `ai_governance/`.
 ## References
 
 ### VaR models and backtesting
-- Engle, R. F., & Manganelli, S. (2001). *Value at risk models in finance* (Working Paper No. 75). European Central Bank.
+- Engle, R. F., & Manganelli, S. (2001). *Value at risk models in finance* (Working Paper No. 75). European Central Bank. https://papers.ssrn.com/sol3/papers.cfm?abstract_id=356220
+- Engle, R. F., & Manganelli, S. (2004) *CAViaR: Conditional Autoregressive Value at Risk by Regression Quantiles* https://pages.stern.nyu.edu/~rengle/CAVIAR.pdf
 - Zhang, Y., & Nadarajah, S. (2017). A review of backtesting for value at risk. *Communications in Statistics – Theory and Methods*, 1–24. https://doi.org/10.1080/03610926.2017.1361984
 
 ### Machine learning for VaR forecasting

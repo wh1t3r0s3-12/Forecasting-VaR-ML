@@ -1,0 +1,194 @@
+% =====================================================================
+%  Project Specification Document - Forecasting VaR with Machine Learning
+%  Raphaël POUNGAVANON, Rémi KORDEK - ESILV A4 IF4
+%  Compile with pdfLaTeX (e.g. on Overleaf) - 2 passes for references
+% =====================================================================
+\documentclass[10pt,a4paper]{article}
+
+% ---------- Encoding & language ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+
+% ---------- Layout ----------
+\usepackage[a4paper,margin=1.6cm,bottom=1.8cm]{geometry}
+\usepackage{parskip}
+\setlength{\parskip}{4pt}
+\usepackage{microtype}
+
+% ---------- Tables, lists, colors, math ----------
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\setlist{nosep,leftmargin=1.4em,itemsep=2pt}
+\usepackage[table]{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage[most]{tcolorbox}
+
+% ---------- Section style ----------
+\usepackage{titlesec}
+\titleformat{\section}{\sffamily\large\bfseries}{\thesection.}{0.5em}{}[\vspace{-4pt}\rule{\linewidth}{0.4pt}]
+\titlespacing*{\section}{0pt}{9pt}{4pt}
+
+% ---------- Header / footer ----------
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[R]{\footnotesize\color{gray} Raphaël POUNGAVANON, Rémi KORDEK (ESILV A4 IF4) -- Project Specification Document \quad|\quad Page \thepage\ of \pageref{LastPage}}
+
+% ---------- Links ----------
+\usepackage[colorlinks=true,linkcolor=black,urlcolor=blue!60!black]{hyperref}
+
+% ---------- Shortcuts ----------
+\newcommand{\code}[1]{\texttt{\small #1}}
+\newtcolorbox{questionbox}{colback=gray!8,colframe=black!80,boxrule=0pt,leftrule=3pt,
+  sharp corners,left=8pt,right=8pt,top=4pt,bottom=4pt,fontupper=\itshape}
+
+% =====================================================================
+\begin{document}
+
+% ---------- Title ----------
+{\sffamily\footnotesize\color{gray!70!black} ESILV A4 -- Financial Engineering (IF4) \hfill Machine Learning Project -- Week 1 Deliverable (November 2026)}\\[2pt]
+{\LARGE\bfseries Project Specification Document}\\[2pt]
+{\sffamily\bfseries Forecasting Value at Risk by Machine Learning Methods}\\[-4pt]
+\rule{\linewidth}{1.2pt}
+
+% =====================================================================
+\section{Project Title}
+\textbf{Forecasting Value at Risk with Machine Learning:} Can Quantile Regression Beat Historical Simulation?
+
+% =====================================================================
+\section{Team Members}
+\textbf{Group:} Raphaël POUNGAVANON, Rémi KORDEK --- \textbf{Engineering field / Major:} Financial Engineering (ESILV A4, IF4 TD group).
+
+% =====================================================================
+\section{Context and Motivation}
+Value at Risk (VaR) is the maximum loss a portfolio is expected to suffer over a given horizon at a given confidence level (e.g.\ at 99\,\%, the loss should exceed the VaR only 1 day out of 100). Regulations (Basel accords) require banks to calculate a VaR on a daily basis, and their regulatory capital directly depends on this figure. To compute this VaR, banks predominantly employ a \textbf{historical simulation} method, typically covering a rolling window of 250 to 500 trading days (roughly 1 to 2 years). Historical simulation assumes that the recent past represents the future: it reacts slowly to volatility changes and tends to underestimate risk at the start of crises, while remaining overly conservative after calm returns.
+
+Following the methodological turning point of Engle and Manganelli (2001) with the CAViaR framework, VaR can be estimated directly by quantile regression instead of modelling the entire return distribution. However, there is no consensus in the recent scientific literature (Petneházi, 2021; Chronopoulos et al., 2023; Qiu et al., 2024; Vo, 2026; Amjad et al., 2026) regarding the real added value of machine learning (ML) models once formal backtesting is applied; consequently, determining this is precisely the objective of this project using quantile-regression ML models. Market risk measurement is a core task of financial engineering, and this project combines quantitative finance, econometrics and machine learning, the main skills of our major.
+
+% =====================================================================
+\section{Problem Statement}
+\begin{questionbox}
+``Can a quantile-regression Machine Learning model forecast the 1-day 99\,\% Value at Risk of a stock index (S\&P~500) more accurately than historical simulation, the industry-standard baseline --- and does the gain come from the model or from the features?''
+\end{questionbox}
+This main research question breaks down into four concrete sub-questions:
+\begin{enumerate}
+  \item \textbf{Feature contribution:} Which variables carry the information for tail risk (recent realized volatility, implied volatility VIX, intraday High--Low range, lagged returns) --- which one is indispensable?
+  \item \textbf{Model vs.\ features:} With the exact same features, does a non-linear ML model (Gradient Boosting, Neural Network) beat a linear quantile regression? This test separates the model effect from the feature effect.
+  \item \textbf{Regime behaviour:} Where do the models fail --- in calm periods or during crisis episodes (2020 COVID crash, 2022 rate shock)?
+  \item \textbf{Asymmetric cost of errors:} Does the model underestimate or overestimate risk? The two errors do not have the same cost: underestimating exposes the bank, whereas overestimating immobilizes capital unnecessarily.
+\end{enumerate}
+
+% =====================================================================
+\section{Project Objectives}
+\begin{itemize}
+  \item \textbf{Objective 1 (Pinball loss):} Reduce the out-of-sample \textbf{mean pinball loss} at $\alpha = 0.01$ by at least \textbf{5\,\%} compared to the 250-day historical simulation baseline on the test period.
+  \item \textbf{Objective 2 (Violation rate \& backtesting):} Obtain an empirical \textbf{violation rate} between \textbf{0.7\,\% and 1.5\,\%} for a 99\,\% VaR (theoretical target: 1.0\,\%) and pass the Kupiec proportion-of-failures test and the Christoffersen independence test.
+  \item \textbf{Objective 3 (Model vs.\ features attribution):} Run a controlled comparison across (i) Historical Simulation (no features, past returns only), (ii) Linear Quantile Regression (full feature set), and (iii) non-linear ML models (same feature set).
+  \item \textbf{Objective 4 (Feature selection):} Identify the \textbf{top three most informative features} using the Lab~4 feature selection toolbox (univariate filters, wrappers and embedded importances).
+\end{itemize}
+
+% =====================================================================
+\section{Dataset Description}
+\textbf{Source and link:} The dataset is downloaded with the open-source Python library \code{yfinance} from Yahoo Finance (\href{https://finance.yahoo.com/quote/\%5EGSPC}{\code{\textasciicircum GSPC}} for the S\&P~500 and \href{https://finance.yahoo.com/quote/\%5EVIX}{\code{\textasciicircum VIX}} for the CBOE Volatility Index). The data are free, publicly available and reproducible without an API key (optional macro-financial series from the FRED API are also checked in \code{01\_data\_collecting.ipynb}).
+
+\textbf{Size and variables:} Daily time series from \textbf{January 3, 2000 to November 20, 2026}, giving \textbf{6,763 trading days} after inner date alignment (and 6,702 clean observations in \code{data/processed/dataset.csv} after the 60-day rolling window). From the adjusted closing price $P_t$, we compute daily log-returns $r_t = \ln(P_t / P_{t-1})$. The target variable is tomorrow's return $r_{t+1}$, of which the model forecasts the 1\,\% quantile (the 1-day 99\,\% VaR):
+
+\begin{center}
+\small
+\rowcolors{2}{gray!6}{white}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{2.9cm} >{\raggedright}p{2.1cm} >{\raggedright}p{4.0cm} X@{}}
+\toprule
+\textbf{Variable} & \textbf{Role / Type} & \textbf{Formula / Construction} & \textbf{Economic \& Statistical Role} \\
+\midrule
+\code{target} ($r_{t+1}$) & Target (float) & \code{df["r"].shift(-1)} & Tomorrow's daily log-return; we predict its 1\,\% quantile. \\
+\code{r}, \code{r\_lag1} & Features (float) & $r_t$ and $r_{t-1}$ & Today's and yesterday's log-returns (short-term momentum \& leverage). \\
+\code{abs\_r} & Feature (float) & \code{df["r"].abs()} & Size of today's move $|r_t|$ (proxy for instantaneous shock). \\
+\code{vol\_5}, \code{vol\_20}, \code{vol\_60} & Features (float) & \code{df["r"].rolling(w).std()} & Realized rolling volatility over 5, 20 and 60 trading days. \\
+\code{range} & Feature (float) & \code{(High - Low) / Close} & Intraday range of the S\&P~500, a proxy for daily volatility. \\
+\code{VIX}, \code{VIX\_range} & Features (float) & VIX Close \& \code{(High - Low) / Close} & Implied volatility from S\&P~500 option prices and intraday vol-of-vol. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\textbf{Justification of suitability \& initial EDA findings} (\code{02\_eda\_processing.ipynb}):
+\begin{itemize}
+  \item \emph{Matches the problem, frequency \& literature:} A major equity index is a realistic, diversified proxy for a bank's equity trading book at the regulatory 1-day horizon, and the standard benchmark in VaR forecasting papers. Its 26-year history spans several major crises (2000--2002 dot-com crash, 2008 financial crisis, 2011 euro debt crisis, 2020 COVID crash, 2022 rate shock), providing enough extreme observations to train and backtest a 1\,\% tail-risk model while keeping more than 250 test days.
+  \item \emph{Data quality \& preprocessing:} Prices are adjusted for dividends and splits. Two US federal holidays present in the VIX (Memorial Day and Labor Day), where the S\&P~500 is not priced, are removed via an inner join. Zero-volume artifacts from Yahoo Finance on the S\&P~500 are replaced by the previous day's volume (\code{ffill}), and the VIX volume (always 0, since the VIX is not a tradeable asset) is dropped.
+  \item \emph{Statistical stylized facts from our EDA:} Daily log-returns have a mean of 0.023\,\%, a standard deviation of 1.21\,\%, a negative skewness ($-0.36$: large losses are more frequent than large gains) and a kurtosis of \textbf{10.84} $\gg 0$ (fat tails). The empirical 1\,\% quantile is \textbf{$-3.46$\,\%} vs.\ \textbf{$-2.79$\,\%} for a normal distribution, confirming that a Gaussian VaR underestimates risk. The ACF of $r_t$ is close to 0 (market direction is unpredictable), but the ACF of $|r_t|$ stays around 0.30 even after 40 days (volatility clustering), which explains why our volatility features are useful for the VaR. Finally, the high correlation among volatility features (up to 0.87) shows redundancy, which motivates feature selection.
+  \item \emph{Potential limitations:} Single asset (results may not generalize to all markets); few independent extreme events in history (tail uncertainty); 1-day horizon (regulations also use 10-day horizons); and VaR does not measure the loss magnitude beyond the threshold (which motivated Expected Shortfall in Basel~III).
+\end{itemize}
+
+% =====================================================================
+\section{Machine Learning Task}
+\begin{itemize}
+  \item \textbf{Task:} Supervised \textbf{quantile regression} at quantile level $\alpha = 0.01$ on tabular time-series features.
+  \item \textbf{Expected output:} A continuous daily value $\widehat{\mathrm{VaR}}_{t+1} = \hat{Q}_{0.01}(r_{t+1} \mid X_t)$ forecasting the 1\,\% quantile of tomorrow's log-return.
+  \item \textbf{Models to compare:} Linear Quantile Regression (\code{QuantileRegressor(quantile=0.01)}), Gradient Boosting Quantile Regression (\code{GradientBoostingRegressor(loss="quantile", alpha=0.01)}), and an advanced model / ensemble in Week~4 (Quantile Random Forest or Deep Quantile Neural Network, following Chronopoulos et al., 2023).
+\end{itemize}
+
+% =====================================================================
+\section{Baseline Strategy}
+\begin{itemize}
+  \item \textbf{Selected baseline algorithm:} \textbf{250-day rolling historical simulation} (roughly 1 trading year). Tomorrow's VaR is the empirical 1\,\% quantile of the last 250 observed returns: \code{var\_baseline = df["r"].rolling(250).quantile(0.01)}.
+  \item \textbf{Justification:} It is the method actually used by banks, it requires no distributional assumption, and Engle \& Manganelli (2001) show that it is a special case of the quantile regression framework, which makes the comparison with our ML quantile models legitimate. A secondary parametric Gaussian (delta-normal) VaR will also be computed as a pedagogical counter-example of fat-tail underestimation.
+\end{itemize}
+
+% =====================================================================
+\section{Evaluation Strategy}
+\textbf{Evaluation metrics (why RMSE is excluded):} RMSE targets a conditional mean and penalizes errors symmetrically, which makes no sense for an extreme 1\,\% quantile. We use:
+\begin{enumerate}
+  \item \textbf{Primary metric -- Mean Pinball Loss (quantile loss):} \code{mean\_pinball\_loss(y\_true, var\_pred, alpha=0.01)}, with
+  \[
+    L_\alpha(y,\hat q) = \max\big(\alpha\,(y-\hat q),\ (\alpha-1)\,(y-\hat q)\big),
+  \]
+  which penalizes an underestimated loss 99 times more than an overestimated one and matches the loss optimized by our models.
+  \item \textbf{Secondary metric -- Violation rate:} \code{(y\_true < var\_pred).mean()} (expected: 1.0\,\%).
+  \item \textbf{Regulatory backtesting:} \textbf{Kupiec (1995)} proportion-of-failures test, \textbf{Christoffersen (1998)} independence test, and \textbf{Basel traffic-light} classification, reported both overall and separately on calm vs.\ crisis periods.
+\end{enumerate}
+
+\textbf{Data splitting \& leakage prevention:} Because the data are temporal, \textbf{random splitting (\code{train\_test\_split}) or \code{StratifiedKFold} is strictly excluded} (it would train on 2023 to predict 2008). We use a \textbf{strict chronological split}: \textbf{Train (2000--2015)}, \textbf{Validation (2016--2019)} and \textbf{Test (2020--Nov.\ 2026)}. Hyperparameters and feature selection are tuned with \code{TimeSeriesSplit} inside a scikit-learn \code{Pipeline} (so scaling and selection are never fitted on validation/test data), all rolling features only use data up to day $t$ to predict $r_{t+1}$, the test set is used \textbf{only once at the very end}, and \code{random\_state} is fixed everywhere.
+
+% =====================================================================
+\section{Initial Work Plan}
+The 4-week plan and module ownership between both members (tracked in \code{ai\_governance/CONTRIBUTIONS.md}, \code{PROMPT\_LOG.md} and \code{AI\_AUDIT.md}) are organized as follows:
+
+\begin{center}
+\small
+\rowcolors{2}{gray!6}{white}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{1.6cm} X >{\raggedright}p{3.6cm} >{\raggedright\arraybackslash}p{4.2cm}@{}}
+\toprule
+\textbf{Week} & \textbf{Main Tasks} & \textbf{Responsible} & \textbf{Deliverables \& Status} \\
+\midrule
+\textbf{Week 1} (15\,\%) & Topic definition, literature review, S\&P~500 \& VIX collection via \code{yfinance}, data cleaning, feature engineering, initial EDA, project specification. & \textbf{Both} (Raphaël: data \& EDA; Rémi: specs \& literature) & \code{01\_data\_collecting.ipynb}, \code{02\_eda\_processing.ipynb}, spec PDF \textbf{(done)} \\
+\textbf{Week 2} (25\,\%) & Chronological train/val/test split, 250-day historical simulation baseline (and Gaussian VaR), pinball loss, violation rate, Kupiec \& Christoffersen tests. & \textbf{Raphaël} (split \& baseline), \textbf{Rémi} (backtesting metrics) & \code{dataset.csv}, \code{03\_baseline.ipynb}, baseline scores \\
+\textbf{Week 3} (30\,\%) & Linear QR \& Gradient Boosting quantile pipelines, feature selection (filter, wrapper, embedded), \code{TimeSeriesSplit} tuning, calm vs.\ crisis error analysis. & \textbf{Rémi} (linear QR \& selection), \textbf{Raphaël} (boosting \& errors) & \code{04\_ml\_models.ipynb}, comparison table, AI governance logs \\
+\textbf{Week 4} (30\,\%) & Advanced models (ensemble \& neural network), single final evaluation on the 2020--2026 test set, feature vs.\ model attribution, final report \& oral slides. & \textbf{Both} (Raphaël: advanced ML; Rémi: final eval \& report) & \code{05\_advanced\_models.ipynb}, final report PDF \& defense \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% =====================================================================
+\section*{References}
+\begin{small}
+\begin{itemize}[leftmargin=1.2em]
+  \item Engle, R.\,F., \& Manganelli, S. (2001). \emph{Value at risk models in finance} (Working Paper No.~75). European Central Bank.
+  \item Engle, R.\,F., \& Manganelli, S. (2004). CAViaR: Conditional autoregressive value at risk by regression quantiles. \emph{Journal of Business \& Economic Statistics}, 22(4), 367--381.
+  \item Kupiec, P. (1995). Techniques for verifying the accuracy of risk measurement models. \emph{Journal of Derivatives}, 3(2), 73--84.
+  \item Christoffersen, P. (1998). Evaluating interval forecasts. \emph{International Economic Review}, 39(4), 841--862.
+  \item Zhang, Y., \& Nadarajah, S. (2017). A review of backtesting for value at risk. \emph{Communications in Statistics -- Theory and Methods}, 1--24.
+  \item Petneházi, G. (2021). Quantile convolutional neural networks for Value at Risk forecasting. \emph{Machine Learning with Applications}, 6, 100096.
+  \item Chronopoulos, I., Raftapostolos, A., \& Kapetanios, G. (2023). Forecasting Value-at-Risk using deep neural network quantile regression. \emph{Journal of Financial Econometrics}, 1--34.
+  \item Qiu, Z., Lazar, E., \& Nakata, K. (2024). VaR and ES forecasting via recurrent neural network-based stateful models. \emph{International Review of Financial Analysis}, 92, 103102.
+  \item Vo, M. (2026). Deep quantile forecasting: Evaluating advanced neural networks for multi-horizon Value-at-Risk. \emph{International Journal of Financial Studies}, 14, 218.
+  \item Amjad, R., Hassan, A., \& Ahmed, Z. (2026). Neural and econometric forecasting of market risk: A comparative VaR and ES analysis. \emph{Risks}, 14, 228.
+  \item Cheng, X. (2024). A comprehensive study of feature selection techniques in machine learning models. \emph{Insights in Computer, Signals and Systems}, 1(1).
+\end{itemize}
+\end{small}
+
+\end{document}
